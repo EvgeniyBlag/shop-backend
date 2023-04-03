@@ -1,1 +1,1 @@
-# shop-backend
+Backend  for e-commerce application.
