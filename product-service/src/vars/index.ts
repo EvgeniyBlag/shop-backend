@@ -1,0 +1,1 @@
+export const apiUrl = '1zhlwbt77l.execute-api.us-east-1.amazonaws.com';
