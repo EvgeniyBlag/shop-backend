@@ -4,6 +4,8 @@ import productsService from '../../services/products-service';
 
 export const getProductsById = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
+    console.log(`Lambda function 'getProductsById' has been called with parameter ${event.pathParameters?.productId}`);
+
     const product = await productsService.getProductsById(event.pathParameters?.productId ?? '');
 
     if (product) {
