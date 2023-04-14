@@ -43,7 +43,8 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_TABLE: 'products',
-      STOCKS_TABLE: 'stocks'
+      STOCKS_TABLE: 'stocks',
+      TABLE_THROUGHPUT: '1'
     },
   },
   // import the function via paths
@@ -60,7 +61,10 @@ const serverlessConfiguration: AWS = {
           KeySchema:[
             { AttributeName: 'id', KeyType: 'HASH' }
           ],
-          BillingMode: 'PAY_PER_REQUEST'
+          ProvisionedThroughput: {
+            ReadCapacityUnits: '${self:provider.environment.TABLE_THROUGHPUT}',
+            WriteCapacityUnits: '${self:provider.environment.TABLE_THROUGHPUT}'
+          }
         }
       },
       StocksTable: {
@@ -73,7 +77,10 @@ const serverlessConfiguration: AWS = {
           KeySchema:[
             { AttributeName: 'product_id', KeyType: 'HASH' }
           ],
-          BillingMode: 'PAY_PER_REQUEST'
+          ProvisionedThroughput: {
+            ReadCapacityUnits: '${self:provider.environment.TABLE_THROUGHPUT}',
+            WriteCapacityUnits: '${self:provider.environment.TABLE_THROUGHPUT}'
+          }
         }
       }
     }
