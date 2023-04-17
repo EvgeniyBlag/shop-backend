@@ -4,6 +4,8 @@ import productsService from '../../services/products-service';
 
 export const getProductsList = async (): Promise<APIGatewayProxyResult> => {
   try {
+    console.log(`Lambda function 'getProductsList' has been called`);
+
     const products = await productsService.getProductsList();
 
     if (products) {
