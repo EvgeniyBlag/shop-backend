@@ -5,7 +5,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 export const importProductsFile = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   try {
-    const s3 = new AWS.S3({ region: 'us-east-1' });
+    const s3 = new AWS.S3({ region: process.env.REGION ?? 'us-east-1' });
 
     if (!event.queryStringParameters?.name) {
       return formatJSONResponse({
