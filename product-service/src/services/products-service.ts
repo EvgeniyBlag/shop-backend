@@ -55,12 +55,12 @@ class ProductsService implements IProductsService {
         id: uuid.v4(),
         description: product.description,
         title: product.title,
-        price: product.price
+        price: +product.price
     };
 
     const stockItem = {
         product_id: productItem.id,
-        count: product.count
+        count: +product.count
     }
     
     await dynamoDBClient.transactWrite({

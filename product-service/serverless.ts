@@ -4,6 +4,7 @@ import { apiUrl } from './src/vars';
 import getProductsById from '@functions/getProductsById';
 import getProductsList from '@functions/getProductsList';
 import createProduct from '@functions/createProduct';
+import catalogBatchProcess from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -35,6 +36,18 @@ const serverlessConfiguration: AWS = {
               'arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.PRODUCTS_TABLE}',
               'arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.STOCKS_TABLE}',
             ]
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sqs:*',
+            Resource: { 'Fn::GetAtt': ['CatalogItemsQueue', 'Arn'] }
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sns:*',
+            Resource: {
+              Ref: 'CreateProductTopic'
+            }
           }
         ]
       }
@@ -44,13 +57,47 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_TABLE: 'products',
       STOCKS_TABLE: 'stocks',
-      TABLE_THROUGHPUT: '1'
+      TABLE_THROUGHPUT: '1',
+      SQS_CSV_NAME: 'catalog-items-queue',
+      SNS_TOPIC_NAME: 'sns-topic',
+      SNS_ARN: {
+        Ref: 'CreateProductTopic'
+      }
     },
   },
   // import the function via paths
-  functions: { getProductsList, getProductsById, createProduct },
+  functions: { getProductsList, getProductsById, createProduct, catalogBatchProcess },
   resources: {
     Resources: {
+      CatalogItemsQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: '${self:provider.environment.SQS_CSV_NAME}'
+        }
+      },
+      CreateProductTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: '${self:provider.environment.SNS_TOPIC_NAME}'
+        }
+      },
+      SNSTopicSubscriptionCasio: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: 'evgeniy.blagodarov@gmail.com',
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'CreateProductTopic'
+          },
+          FilterPolicyScope: 'MessageBody',
+          FilterPolicy: {
+            title: [
+              'Casio',
+              'Roland'
+            ],
+          },
+        }
+      },
       ProductsTable: {
         Type: 'AWS::DynamoDB::Table',
         Properties: {
@@ -83,6 +130,13 @@ const serverlessConfiguration: AWS = {
           }
         }
       }
+    },
+    Outputs: {
+      sqsUrl: {
+        Value: {
+          Ref: 'CatalogItemsQueue'
+        }
+      }
     }
   },
   package: { individually: true },
@@ -101,7 +155,7 @@ const serverlessConfiguration: AWS = {
       host: apiUrl,
       basePath: '/dev'
     }
-  },
+  }
 };
 
 module.exports = serverlessConfiguration;
