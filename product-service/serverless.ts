@@ -41,6 +41,13 @@ const serverlessConfiguration: AWS = {
             Effect: 'Allow',
             Action: 'sqs:*',
             Resource: { 'Fn::GetAtt': ['CatalogItemsQueue', 'Arn'] }
+          },
+          {
+            Effect: 'Allow',
+            Action: 'sns:*',
+            Resource: {
+              Ref: 'CreateProductTopic'
+            }
           }
         ]
       }
@@ -74,16 +81,23 @@ const serverlessConfiguration: AWS = {
           TopicName: '${self:provider.environment.SNS_TOPIC_NAME}'
         }
       },
-      // SNSTopicSubscription: {
-      //   Type: 'AWS::SNS::Subscription',
-      //   Properties: {
-      //     Endpoint: 'evgeniy.blagodarov@gmail.com',
-      //     protocol: 'email',
-      //     TopicArn: {
-      //       Ref: 'CreateProductTopic'
-      //     }
-      //   }
-      // },
+      SNSTopicSubscriptionCasio: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: 'evgeniy.blagodarov@gmail.com',
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'CreateProductTopic'
+          },
+          FilterPolicyScope: 'MessageBody',
+          FilterPolicy: {
+            title: [
+              'Casio',
+              'Roland'
+            ],
+          },
+        }
+      },
       ProductsTable: {
         Type: 'AWS::DynamoDB::Table',
         Properties: {

@@ -12,11 +12,11 @@ export const catalogBatchProcess = async (event: SQSEvent): Promise<void> => {
     try {
       const createdProduct = await productsService.createProduct(product);
 
-      sns.publish({
-          Subject: 'New product has been added',
+      await sns.publish({
+          Subject: 'Check new products',
           Message: JSON.stringify(createdProduct),
           TopicArn: process.env.SNS_ARN,
-      });
+      }).promise();
     } catch(e) {
       console.error(e);
     }
