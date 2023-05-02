@@ -12,3 +12,5 @@ Lambda Endpoints:
     - GET - [getProductsList](https://1zhlwbt77l.execute-api.us-east-1.amazonaws.com/dev/products)
 
 Import Service links:
+
+Authorization Service links:
