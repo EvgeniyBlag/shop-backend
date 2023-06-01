@@ -136,6 +136,11 @@ const serverlessConfiguration: AWS = {
         Value: {
           Ref: 'CatalogItemsQueue'
         }
+      },
+      getProductsListLambdaArn: {
+        Value : {
+          'Fn::GetAtt' : [ 'GetProductsListLambdaFunction', 'Arn' ]
+        }
       }
     }
   },
